@@ -1,0 +1,31 @@
+{
+  "name": "teesa-eliza",
+  "version": "1.0.0",
+  "description": "Eliza for Teesa-Aapp",
+  "private": true,
+  "packageManager": "pnpm@8.15.4",
+  "workspaces": [
+    "packages/*",
+    "agent"
+  ],
+  "scripts": {
+    "build": "turbo build",
+    "test": "turbo test",
+    "clean": "bash ./scripts/clean.sh",
+    "start": "pnpm --filter \"@teesa-eliza/agent\" start --isRoot",
+    "eliza": "pnpm build && cross-env NODE_ENV=development VERBOSE=true DEFAULT_LOG_LEVEL=debug DEBUG=eliza:* pnpm start"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "uuid": "^11.1.0",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.3",
+    "tsup": "8.3.5",
+    "turbo": "^2.4.4",
+    "typescript": "^5.7.3"
+  }
+}
