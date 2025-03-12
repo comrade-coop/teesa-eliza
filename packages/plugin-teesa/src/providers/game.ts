@@ -43,12 +43,24 @@ interface TeesaHistoryEntry {
     answerResult?: AnswerResultEnum; // Optional to maintain backward compatibility
 }
 
-async function getGameDetails(): Promise<GameDetails | undefined> {
+const teesaUrl = () => {
     const teesaUrl = process.env.TEESA_URL;
+    if(!teesaUrl) {
+        throw new Error("TEESA_URL is not set");
+    }
+
+    if(teesaUrl.endsWith("/")) {
+        return teesaUrl.slice(0, -1);
+    }
+
+    return teesaUrl;
+}
+
+async function getGameDetails(): Promise<GameDetails | undefined> {
     let gameDetails: GameDetails | undefined = undefined;
 
     try {
-        const response = await fetch(`${teesaUrl}/api/get-game-details`);
+        const response = await fetch(`${teesaUrl()}/api/get-game-details`);
         gameDetails = await response.json();
     } catch (error) {
         elizaLogger.error('Failed to fetch Teesa game details:', error);
@@ -58,11 +70,10 @@ async function getGameDetails(): Promise<GameDetails | undefined> {
 }
 
 async function getTeesaHistory(): Promise<TeesaHistoryEntry[]> {
-    const teesaUrl = process.env.TEESA_URL;
     let messages: TeesaHistoryEntry[] = [];
 
     try {
-        const response = await fetch(`${teesaUrl}/api/get-messages?includeSystemMessages=false`);
+        const response = await fetch(`${teesaUrl()}/api/get-messages?includeSystemMessages=false`);
         messages = await response.json();
     } catch (error) {
         elizaLogger.error('Failed to fetch Teesa messages:', error);
