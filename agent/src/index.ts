@@ -17,7 +17,7 @@ import {
 } from "@elizaos/core";
 import { bootstrapPlugin } from "@elizaos/plugin-bootstrap";
 import net from "net";
-import { defaultCharacter } from "./defaultCharacter.js";
+import { teesaCharacter } from "./character/teesa.js";
 
 export const wait = (minTime = 1000, maxTime = 3000) => {
     const waitTime = Math.floor(Math.random() * (maxTime - minTime + 1)) + minTime;
@@ -167,7 +167,7 @@ const checkPortAvailable = (port: number): Promise<boolean> => {
 const startAgents = async () => {
     const directClient = new DirectClient();
     let serverPort = Number.parseInt(settings.SERVER_PORT || "3000");
-    const characters = [defaultCharacter];
+    const characters = [teesaCharacter];
 
     try {
         for (const character of characters) {
