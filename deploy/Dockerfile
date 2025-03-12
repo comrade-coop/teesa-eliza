@@ -1,6 +1,23 @@
 # Use a specific Node.js version for better reproducibility
 FROM node:23.3.0-slim AS builder
 
+# Add build arguments
+# API key for Anthropic
+ARG ANTHROPIC_API_KEY
+# Twitter login credentials
+ARG TWITTER_USERNAME
+ARG TWITTER_PASSWORD
+ARG TWITTER_EMAIL
+# Teesa URL
+ARG TEESA_URL
+
+# Set environment variables that will be available at runtime
+ENV DOCKER_ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+ENV DOCKER_TWITTER_USERNAME=${TWITTER_USERNAME}
+ENV DOCKER_TWITTER_PASSWORD=${TWITTER_PASSWORD}
+ENV DOCKER_TWITTER_EMAIL=${TWITTER_EMAIL}
+ENV DOCKER_TEESA_URL=${TEESA_URL}
+
 # Install pnpm globally and install necessary build tools
 RUN npm install -g pnpm@9.15.1 && \
     apt-get update && \
@@ -16,12 +33,20 @@ WORKDIR /app
 
 # Copy application code
 COPY . .
+COPY deploy/update-env.sh .
+
+# Copy and update .env file
+RUN cp .env.example .env && \
+    chmod +x update-env.sh && \
+    ./update-env.sh
 
 # Install dependencies
-RUN pnpm install
+RUN chmod +x ./scripts/clean.sh && \
+    bash ./scripts/clean.sh && \
+    pnpm install
 
-# Build the project
-RUN pnpm run build && pnpm prune --prod
+# Build the project with Turbo cache disabled
+RUN pnpm run build --no-cache && pnpm prune --prod
 
 # Create a new stage for the final image
 FROM node:23.3.0-slim
@@ -35,7 +60,7 @@ RUN apt-get update && \
 
 WORKDIR /app
 
-# Copy built artifacts and production dependencies from the builder stage
+# Copy .env, built artifacts and production dependencies from the builder stage
 COPY --from=builder /app/package.json ./
 COPY --from=builder /app/pnpm-workspace.yaml ./
 COPY --from=builder /app/.npmrc ./
@@ -44,6 +69,7 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/agent ./agent
 COPY --from=builder /app/packages ./packages
 COPY --from=builder /app/scripts ./scripts
+COPY --from=builder /app/.env ./
 
 # Expose necessary ports
 EXPOSE 3000
