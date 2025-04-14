@@ -6,16 +6,16 @@ import {
 } from "@elizaos/core";
 import type { Memory, Provider, State } from "@elizaos/core";
 
-const TEESA_CONTRACT_ADDRESS_KEY = "teesa/contract_address";
+const TEESA_GAME_ID_KEY = "teesa/game_id";
 const TEESA_MESSAGES_NUMBER_KEY = "teesa/messages_number";
 
 interface GameDetails {
-    contractAddress: string;
-    initialFee: string;
-    currentFee: string;
-    prizePool: string;
-    gameAbandoned: boolean;
+    gameId: string;
+    nftContractAddress: string;
+    openseaCollectionUrl: string;
     winnerAddress: string | undefined;
+    nftId: string | undefined;
+    openseaNftUrl: string | undefined;
 }
 
 export enum MessageTypeEnum {
@@ -40,7 +40,7 @@ interface TeesaHistoryEntry {
     messageType: MessageTypeEnum;
     userMessage: string | undefined;
     llmMessage: string;
-    answerResult?: AnswerResultEnum; // Optional to maintain backward compatibility
+    answerResult: AnswerResultEnum;
 }
 
 const teesaUrl = () => {
@@ -174,41 +174,27 @@ const gameProvider: Provider = {
         const history = await getTeesaHistory();
         const summary = await summarizeTeesaHistory(runtime, history);
 
-        const previousGameContractAddress = await runtime.cacheManager.get(TEESA_CONTRACT_ADDRESS_KEY);
+        const previousGameId = await runtime.cacheManager.get(TEESA_GAME_ID_KEY);
 
-        if(previousGameContractAddress && previousGameContractAddress != gameDetails.contractAddress) {
+        if(previousGameId && previousGameId != gameDetails.gameId) {
             result += "POST AN UPDATE ABOUT THE FOLLOWING: A new game has started. Invite the community to guess the word.";
-        }
-
-        if(gameDetails.winnerAddress) {
+        } else if(gameDetails.winnerAddress && gameDetails.openseaNftUrl) {
             result += "POST AN UPDATE ABOUT THE FOLLOWING:";
             result += "\n";
             result += `- The game has ended. The winner is ${gameDetails.winnerAddress}.`;
             result += "\n";
-            result += `- The next game will start soon.`;
-        }
-
-        if(gameDetails.gameAbandoned) {
-            result += "POST AN UPDATE ABOUT THE FOLLOWING:";
-            result += "\n";
-            result += `- The game has ended due to inactivity.`;
-            result += "\n";
-            result += `- Users can claim their share using the game contract. The game contract address is ${gameDetails.contractAddress}.`;
+            result += `- The winner won this NFT. POST THIS LINK TO THE NFT: ${gameDetails.openseaNftUrl}`;
             result += "\n";
             result += `- The next game will start soon.`;
-        }
-
-        if(summary) {
+        } else if(summary) {
             result += "POST AN UPDATE ABOUT THE FOLLOWING:";
             result += "\n";
-            result += `- Here is what we know about the secret word so far:\n${summary};`;
-            result += "\n";
-            result += `- The prize pool is ${gameDetails.prizePool}.`;
+            result += `- Here is what we know about the secret word so far:\n${summary};`;;
             result += "\n";
             result += `- Invite the community to guess the word.`;
         }
 
-        await runtime.cacheManager.set(TEESA_CONTRACT_ADDRESS_KEY, gameDetails.contractAddress);
+        await runtime.cacheManager.set(TEESA_GAME_ID_KEY, gameDetails.gameId);
 
         return result;
     },
