@@ -1,0 +1,19 @@
+name: Release tag
+
+on:
+  release:
+    types:
+      - published
+
+jobs:
+   deploy-on-dev:
+     runs-on: ubuntu-latest
+ 
+     steps:
+       - name: Deploy to Private Cloud
+         run: |
+           curl --silent --show-error \
+                --location 'https://github-confidential.kubocloud.io/teesa-aapp/deploy?scope=eliza&tag=${{ github.event.release.tag_name }}' \
+                --header 'X-Hook-Timeout: 600' \
+                --header 'CF-Access-Client-Id: ${{ secrets.CF_ACCESS_CLIENT_ID }}' \
+                --header 'CF-Access-Client-Secret: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}'
