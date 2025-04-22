@@ -29,7 +29,7 @@ Make sure you have the following installed:
 3. Build the production Docker image:
    ```bash
    docker build \
-      --build-arg ANTHROPIC_API_KEY=<anthropic_api_key> \ # API key for the Anthropic API
+      --build-arg LLM_API_KEY=<llm_api_key> \ # API key for the LLM
       --build-arg TWITTER_USERNAME=<twitter_username> \ # The username for the twitter account
       --build-arg TWITTER_PASSWORD=<twitter_password> \ # The pasword for the twitter account
       --build-arg TWITTER_EMAIL=<twitter_email> \ # The email address for the twitter account

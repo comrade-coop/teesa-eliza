@@ -42,6 +42,8 @@ export function getTokenForProvider(
             return character.settings?.secrets?.OPENAI_API_KEY || settings.OPENAI_API_KEY;
         case ModelProviderName.ANTHROPIC:
             return character.settings?.secrets?.ANTHROPIC_API_KEY || settings.ANTHROPIC_API_KEY;
+        case ModelProviderName.GROK:
+            return character.settings?.secrets?.GROK_API_KEY || settings.GROK_API_KEY;
         // Add other providers as needed
         default:
             const errorMessage = `Failed to get token - unsupported model provider: ${provider}`;
@@ -98,7 +100,7 @@ function initializeDbCache(character: Character, db: IDatabaseCacheAdapter) {
 async function findDatabaseAdapter(runtime: AgentRuntime) {
     const { adapters } = runtime;
     let adapter: Adapter | undefined = adapters[0];
-    
+
     if (!adapter) {
         const sqliteAdapterPlugin = await import('@elizaos-plugins/adapter-sqlite');
         const sqliteAdapterPluginDefault = sqliteAdapterPlugin.default;
@@ -107,7 +109,7 @@ async function findDatabaseAdapter(runtime: AgentRuntime) {
             throw new Error("Internal error: No database adapter found for default adapter-sqlite");
         }
     }
-    
+
     const adapterInterface = (adapter as Adapter).init(runtime);
     if (!adapterInterface) {
         throw new Error("Failed to initialize database adapter");
