@@ -34,17 +34,8 @@ export function getTokenForProvider(
     character: Character
 ): string | undefined {
     switch (provider) {
-        case ModelProviderName.LLAMALOCAL:
-        case ModelProviderName.OLLAMA:
-        case ModelProviderName.LMSTUDIO:
-            return "";
-        case ModelProviderName.OPENAI:
-            return character.settings?.secrets?.OPENAI_API_KEY || settings.OPENAI_API_KEY;
-        case ModelProviderName.ANTHROPIC:
-            return character.settings?.secrets?.ANTHROPIC_API_KEY || settings.ANTHROPIC_API_KEY;
-        case ModelProviderName.GROK:
-            return character.settings?.secrets?.GROK_API_KEY || settings.GROK_API_KEY;
-        // Add other providers as needed
+        case ModelProviderName.OPENROUTER:
+            return character.settings?.secrets?.OPENROUTER_API_KEY || settings.OPENROUTER_API_KEY;
         default:
             const errorMessage = `Failed to get token - unsupported model provider: ${provider}`;
             elizaLogger.error(errorMessage);

@@ -1,6 +1,6 @@
 #!/bin/sh
 # Update LLM API key
-sed -i "s|GROK_API_KEY=.*|GROK_API_KEY=$DOCKER_LLM_API_KEY|g" .env
+sed -i "s|OPENROUTER_API_KEY=.*|OPENROUTER_API_KEY=$DOCKER_LLM_API_KEY|g" .env
 
 # Update Twitter configuration
 sed -i "s|TWITTER_USERNAME=.*|TWITTER_USERNAME=$DOCKER_TWITTER_USERNAME|g" .env
