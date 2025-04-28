@@ -279,7 +279,7 @@ export class TwitterPostClient {
 
             const lastPostTimestamp = lastPost?.timestamp ?? 0;
             const isReflectMode = this.client.twitterConfig.TWITTER_REFLECT_MODE;
-            const reflectModeDelay = 60;
+            const reflectModeDelay = 4.5;
             let delayMinutes;
 
             if (isReflectMode) {
